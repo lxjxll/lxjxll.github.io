@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Docker下安装mysql</title>
+    <url>/2021/09/24/Docker%E4%B8%8B%E5%AE%89%E8%A3%85mysql/</url>
+    <content><![CDATA[<h3 id="拉取mysql镜像"><a href="#拉取mysql镜像" class="headerlink" title="拉取mysql镜像"></a>拉取mysql镜像</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker pull mysql</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -p 3306:3306 \</span><br><span class="line">--privileged=true  --restart=always --name mysql \</span><br><span class="line">-v /mydata/mysql/log:/var/log/mysql \</span><br><span class="line">-v /mydata/mysql/data:/var/lib/mysql \</span><br><span class="line">-v /mydata/mysql/conf:/etc/mysql \</span><br><span class="line">-e MYSQL_ROOT_PASSWORD=root \</span><br><span class="line">-d mysql:latest</span><br></pre></td></tr></table></figure>
+<h3 id="mysql配置"><a href="#mysql配置" class="headerlink" title="mysql配置"></a>mysql配置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[mysql]</span><br><span class="line">default-character-set=utf8</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">init_connect=&#x27;SET collation_connection = utf8_unicode_ci&#x27;</span><br><span class="line">init_connect=&#x27;SET NAMES utf8&#x27;</span><br><span class="line">character-set-server=utf8</span><br><span class="line">collation-server=utf8_unicode_ci</span><br><span class="line">skip-character-set-client-handshake</span><br><span class="line">skip-name-resolve</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>docker</tag>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker下安装mysql</title>
+    <url>/2022/05/07/Docker%E4%B8%8B%E5%AE%89%E8%A3%85php/</url>
+    <content><![CDATA[<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d -v /mydata/nginx/www:/var/www/html -p 9000:9000 --name php-7.4 php:7.4-fpm</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>github配置webhook实现博客自动部署</title>
     <url>/2021/09/25/github%E9%85%8D%E7%BD%AEwebhook%E5%AE%9E%E7%8E%B0%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2/</url>
     <content><![CDATA[<p>因为经常更新博客，每次都需要手动push，再从github上pull到主机，重复操作很麻烦，因此配置webhook实现自动部署，<br>解放双手！</p>
@@ -12,20 +31,6 @@
       <tags>
         <tag>github</tag>
         <tag>webhook</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Docker下安装mysql</title>
-    <url>/2021/09/24/Docker%E4%B8%8B%E5%AE%89%E8%A3%85mysql/</url>
-    <content><![CDATA[<p>###拉取mysql镜像</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker pull mysql</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -p 3306:3306 \</span><br><span class="line">--privileged=true  --restart=always --name mysql \</span><br><span class="line">-v /mydata/mysql/log:/var/log/mysql \</span><br><span class="line">-v /mydata/mysql/data:/var/lib/mysql \</span><br><span class="line">-v /mydata/mysql/conf:/etc/mysql \</span><br><span class="line">-e MYSQL_ROOT_PASSWORD=root \</span><br><span class="line">-d mysql:latest</span><br></pre></td></tr></table></figure>
-
-<p>###mysql配置</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[mysql]</span><br><span class="line">default-character-set=utf8</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">init_connect=&#x27;SET collation_connection = utf8_unicode_ci&#x27;</span><br><span class="line">init_connect=&#x27;SET NAMES utf8&#x27;</span><br><span class="line">character-set-server=utf8</span><br><span class="line">collation-server=utf8_unicode_ci</span><br><span class="line">skip-character-set-client-handshake</span><br><span class="line">skip-name-resolve</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>docker</tag>
-        <tag>mysql</tag>
       </tags>
   </entry>
   <entry>
@@ -188,6 +193,26 @@
       </tags>
   </entry>
   <entry>
+    <title>win10去除快捷方式小箭头</title>
+    <url>/2021/11/08/win10%E5%8E%BB%E9%99%A4%E5%BF%AB%E6%8D%B7%E6%96%B9%E5%BC%8F%E5%B0%8F%E7%AE%AD%E5%A4%B4/</url>
+    <content><![CDATA[<h3 id="1-去掉小箭头"><a href="#1-去掉小箭头" class="headerlink" title="1.去掉小箭头"></a>1.去掉小箭头</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">reg add &quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons&quot; /v 29 /d &quot;%systemroot%\system32\imageres.dll,197&quot; /t reg_sz /f</span><br><span class="line">taskkill /f /im explorer.exe</span><br><span class="line">attrib -s -r -h &quot;%userprofile%\AppData\Local\iconcache.db&quot;</span><br><span class="line">del &quot;%userprofile%\AppData\Local\iconcache.db&quot; /f /q</span><br><span class="line">start explorer</span><br><span class="line">pause</span><br></pre></td></tr></table></figure>
+<h3 id="2-恢复小箭头"><a href="#2-恢复小箭头" class="headerlink" title="2.恢复小箭头"></a>2.恢复小箭头</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">reg delete &quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons&quot; /v 29 /f</span><br><span class="line">taskkill /f /im explorer.exe</span><br><span class="line">attrib -s -r -h &quot;%userprofile%\AppData\Local\iconcache.db&quot;</span><br><span class="line">del &quot;%userprofile%\AppData\Local\iconcache.db&quot; /f /q</span><br><span class="line">start explorer</span><br><span class="line">pause</span><br></pre></td></tr></table></figure>
+<p>复制以上代码保存至.bat文件，管理员身份打开即可</p>
+]]></content>
+      <categories>
+        <category>win10</category>
+      </categories>
+      <tags>
+        <tag>win10</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>常用Linux命令</title>
+    <url>/2021/09/24/%E5%B8%B8%E7%94%A8Linux%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<h2 id="不定期更新Linux常用命令"><a href="#不定期更新Linux常用命令" class="headerlink" title="不定期更新Linux常用命令"></a>不定期更新Linux常用命令</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">netstat -nultp   //查看端口占用情况</span><br><span class="line">nohup sh startup.sh -m standalone &amp; //启动nacos</span><br><span class="line">chmod -R 777 /** //Linux修改文件操作权限命令</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run --name seata-server -d \</span><br><span class="line">       -p 8091:8091 \</span><br><span class="line">       -e SEATA_IP=120.76.137.203 \</span><br><span class="line">       -e SEATA_PORT=8091 \</span><br><span class="line">       -e SEATA_CONFIG_NAME=file:/root/seata-config/registry \</span><br><span class="line">       -v /mydata/seata/config:/root/seata-config  \</span><br><span class="line">       -v /mydata/seata/logs:/root/logs \</span><br><span class="line">       --privileged=true \</span><br><span class="line">       seataio/seata-server:1.4.2</span><br></pre></td></tr></table></figure>]]></content>
+  </entry>
+  <entry>
     <title>图库</title>
     <url>/2021/05/20/%E5%9B%BE%E5%BA%93/</url>
     <content><![CDATA[<div class="gallery-group-main">    
@@ -226,26 +251,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>win10去除快捷方式小箭头</title>
-    <url>/2021/11/08/win10%E5%8E%BB%E9%99%A4%E5%BF%AB%E6%8D%B7%E6%96%B9%E5%BC%8F%E5%B0%8F%E7%AE%AD%E5%A4%B4/</url>
-    <content><![CDATA[<h3 id="1-去掉小箭头"><a href="#1-去掉小箭头" class="headerlink" title="1.去掉小箭头"></a>1.去掉小箭头</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">reg add &quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons&quot; /v 29 /d &quot;%systemroot%\system32\imageres.dll,197&quot; /t reg_sz /f</span><br><span class="line">taskkill /f /im explorer.exe</span><br><span class="line">attrib -s -r -h &quot;%userprofile%\AppData\Local\iconcache.db&quot;</span><br><span class="line">del &quot;%userprofile%\AppData\Local\iconcache.db&quot; /f /q</span><br><span class="line">start explorer</span><br><span class="line">pause</span><br></pre></td></tr></table></figure>
-<h3 id="2-恢复小箭头"><a href="#2-恢复小箭头" class="headerlink" title="2.恢复小箭头"></a>2.恢复小箭头</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">reg delete &quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons&quot; /v 29 /f</span><br><span class="line">taskkill /f /im explorer.exe</span><br><span class="line">attrib -s -r -h &quot;%userprofile%\AppData\Local\iconcache.db&quot;</span><br><span class="line">del &quot;%userprofile%\AppData\Local\iconcache.db&quot; /f /q</span><br><span class="line">start explorer</span><br><span class="line">pause</span><br></pre></td></tr></table></figure>
-<p>复制以上代码保存至.bat文件，管理员身份打开即可</p>
-]]></content>
-      <categories>
-        <category>win10</category>
-      </categories>
-      <tags>
-        <tag>win10</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>常用Linux命令</title>
-    <url>/2021/09/24/%E5%B8%B8%E7%94%A8Linux%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<h2 id="不定期更新Linux常用命令"><a href="#不定期更新Linux常用命令" class="headerlink" title="不定期更新Linux常用命令"></a>不定期更新Linux常用命令</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">netstat -nultp   //查看端口占用情况</span><br><span class="line">nohup sh startup.sh -m standalone &amp; //启动nacos</span><br><span class="line">chmod -R 777 /** //Linux修改文件操作权限命令</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run --name seata-server -d \</span><br><span class="line">       -p 8091:8091 \</span><br><span class="line">       -e SEATA_IP=120.76.137.203 \</span><br><span class="line">       -e SEATA_PORT=8091 \</span><br><span class="line">       -e SEATA_CONFIG_NAME=file:/root/seata-config/registry \</span><br><span class="line">       -v /mydata/seata/config:/root/seata-config  \</span><br><span class="line">       -v /mydata/seata/logs:/root/logs \</span><br><span class="line">       --privileged=true \</span><br><span class="line">       seataio/seata-server:1.4.2</span><br></pre></td></tr></table></figure>]]></content>
-  </entry>
-  <entry>
     <title>测试</title>
     <url>/2021/05/14/%E6%B5%8B%E8%AF%95/</url>
     <content><![CDATA[<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><h2 id="删除多余网络连接"><a href="#删除多余网络连接" class="headerlink" title="删除多余网络连接"></a>删除多余网络连接</h2><p>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles</p>
@@ -270,14 +275,6 @@
       <tags>
         <tag>笔记</tag>
         <tag>练习</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Docker下安装mysql</title>
-    <url>/2022/05/07/Docker%E4%B8%8B%E5%AE%89%E8%A3%85php/</url>
-    <content><![CDATA[<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d -v /mydata/nginx/www:/var/www/html -p 9000:9000 --name php-7.4 php:7.4-fpm</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>docker</tag>
       </tags>
   </entry>
 </search>
