@@ -2,6 +2,14 @@
 <search>
   <entry>
     <title>Docker下安装mysql</title>
+    <url>/2022/05/07/Docker%E4%B8%8B%E5%AE%89%E8%A3%85php/</url>
+    <content><![CDATA[<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d -v /mydata/nginx/www:/var/www/html -p 9000:9000 --name php-7.4 php:7.4-fpm</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker下安装mysql</title>
     <url>/2021/09/24/Docker%E4%B8%8B%E5%AE%89%E8%A3%85mysql/</url>
     <content><![CDATA[<p>###拉取mysql镜像</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker pull mysql</span><br></pre></td></tr></table></figure>
@@ -12,14 +20,6 @@
       <tags>
         <tag>docker</tag>
         <tag>mysql</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Docker下安装mysql</title>
-    <url>/2022/05/07/Docker%E4%B8%8B%E5%AE%89%E8%A3%85php/</url>
-    <content><![CDATA[<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d -v /mydata/nginx/www:/var/www/html -p 9000:9000 --name php-7.4 php:7.4-fpm</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>docker</tag>
       </tags>
   </entry>
   <entry>
@@ -37,6 +37,64 @@
         <tag>docker</tag>
         <tag>wordpress</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>github配置webhook实现博客自动部署</title>
+    <url>/2021/09/25/github%E9%85%8D%E7%BD%AEwebhook%E5%AE%9E%E7%8E%B0%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2/</url>
+    <content><![CDATA[<p>因为经常更新博客，每次都需要手动push，再从github上pull到主机，重复操作很麻烦，因此配置webhook实现自动部署，<br>解放双手！</p>
+<p>###在主机中写入server.js文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">var http = require(&#x27;http&#x27;)</span><br><span class="line">  , exec = require(&#x27;exec&#x27;)</span><br><span class="line"> </span><br><span class="line">const PORT = 9988</span><br><span class="line">  , PATH = &#x27;../html&#x27;</span><br><span class="line"> </span><br><span class="line">var deployServer = http.createServer(function(request, response) &#123;</span><br><span class="line">  if (request.url.search(/deploy\/?$/i) &gt; 0) &#123;</span><br><span class="line"> </span><br><span class="line">    var commands = [</span><br><span class="line">      &#x27;cd &#x27; + PATH,</span><br><span class="line">      &#x27;git fetch --all&#x27;,</span><br><span class="line">      &#x27;git reset --hard origin/master&#x27;,</span><br><span class="line">      &#x27;git pull origin master&#x27;</span><br><span class="line">    ].join(&#x27; &amp;&amp; &#x27;)</span><br><span class="line"> </span><br><span class="line">    exec(commands, function(err, out, code) &#123;</span><br><span class="line">      if (err instanceof Error) &#123;</span><br><span class="line">        response.writeHead(500)</span><br><span class="line">        response.end(&#x27;Server Internal Error.&#x27;)</span><br><span class="line">        throw err</span><br><span class="line">      &#125;</span><br><span class="line">      process.stderr.write(err)</span><br><span class="line">      process.stdout.write(out)</span><br><span class="line">      response.writeHead(200)</span><br><span class="line">      response.end(&#x27;Deploy Done.&#x27;)</span><br><span class="line"> </span><br><span class="line">    &#125;)</span><br><span class="line"> </span><br><span class="line">  &#125; else &#123;</span><br><span class="line"> </span><br><span class="line">    response.writeHead(404)</span><br><span class="line">    response.end(&#x27;Not Found.&#x27;)</span><br><span class="line"> </span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"> </span><br><span class="line">deployServer.listen(PORT)</span><br></pre></td></tr></table></figure>
+
+<p>###后台启动server.js<br>因为直接使用node server.js ，可能会被杀掉进程，不能保持运行，所以使用pm2来管理进程，<br>(或者使用forever)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install pm2 -g</span><br></pre></td></tr></table></figure>
+<p>另外使用server_run.js脚本来启动server.js</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//run</span><br><span class="line">const &#123; exec &#125; = require(&#x27;child_process&#x27;)</span><br><span class="line">exec(&#x27;node server.js&#x27;,(error, stdout, stderr) =&gt; &#123;</span><br><span class="line">        if(error)&#123;</span><br><span class="line">                console.log(&#x27;exec error: $&#123;error&#125;&#x27;)</span><br><span class="line">                return</span><br><span class="line">        &#125;</span><br><span class="line">        console.log(&#x27;stdout: $&#123;stdout&#125;&#x27;);</span><br><span class="line">        console.log(&#x27;stderr: $&#123;stderr&#125;&#x27;);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>将server_run.js添加到pm2进程</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo pm2 start server_run.js  // 启动服务</span><br><span class="line"> </span><br><span class="line">sudo pm2 save // 保存服务</span><br><span class="line"> </span><br><span class="line">sudo pm2 startup // 把已启动服务加到systemd中</span><br><span class="line"> </span><br><span class="line">sudo systemctl reboot // 重启，发现之前的服务都已经启动</span><br><span class="line"> </span><br><span class="line">sudo pm2 unstartup systemd // 删除自动启动服务</span><br></pre></td></tr></table></figure>
+<p>###使用forever保持进程<br>安装forever</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -g forever</span><br></pre></td></tr></table></figure>
+<p>运行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">forever start server.js</span><br></pre></td></tr></table></figure>
+
+
+<p>好了，server.js监听9988端口，<a href="https://github.com/[">https://github.com/[</a> 用户名 ]/[ 仓库名称 ]/settings/hooks中<br>添加<a href="http://198.168.xxx.xxx:9988/deploy/">http://198.168.xxx.xxx:9988/deploy/</a><br>当本地Push仓库后，github会自动发送请求从而实现自动部署</p>
+]]></content>
+      <tags>
+        <tag>github</tag>
+        <tag>webhook</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2021/05/14/hello-world/</url>
+    <content><![CDATA[<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Tabs"><a href="#Tabs" class="headerlink" title="Tabs"></a>Tabs</h3><div class="tabs" id="unique-name"><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#unique-name-1"><i class="icon]"></i>[Tab caption] [</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="unique-name-1"><p>Any content (support inline tags too).</p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
+
+<p>Unique name   : Unique name of tabs block tag without comma.<br>                Will be used in #id’s as prefix for each tab with their index numbers.<br>                If there are whitespaces in name, for generate #id all whitespaces will replaced by dashes.<br>                Only for current url of post/page must be unique!<br>[index]       : Index number of active tab.<br>                If not specified, first tab (1) will be selected.<br>                If index is -1, no tab will be selected. It’s will be something like spoiler.<br>                Optional parameter.<br>[Tab caption] : Caption of current tab.<br>                If not caption specified, unique name with tab index suffix will be used as caption of tab.<br>                If not caption specified, but specified icon, caption will empty.<br>                Optional parameter.<br>[@icon]       : FontAwesome icon name (full-name, look like ‘fas fa-font’)<br>                Can be specified with or without space; e.g. ‘Tab caption @icon’ similar to ‘Tab caption@icon’.<br>                Optional parameter.</p>
+<h3 id="demo1"><a href="#demo1" class="headerlink" title="demo1"></a>demo1</h3><div class="tabs" id="test1"><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#test1-1">test1 1</button></li><li class="tab"><button type="button" data-href="#test1-2">test1 2</button></li><li class="tab"><button type="button" data-href="#test1-3">test1 3</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="test1-1"><p><strong>This is Tab 1.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test1-2"><p><strong>This is Tab 2.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test1-3"><p><strong>This is Tab 3.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
+
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="demo2"><a href="#demo2" class="headerlink" title="demo2"></a>demo2</h3><div class="tabs" id="test2"><ul class="nav-tabs"><li class="tab"><button type="button" data-href="#test2-1">test2 1</button></li><li class="tab"><button type="button" data-href="#test2-2">test2 2</button></li><li class="tab active"><button type="button" data-href="#test2-3">test2 3</button></li></ul><div class="tab-contents"><div class="tab-item-content" id="test2-1"><p><strong>This is Tab 1.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test2-2"><p><strong>This is Tab 2.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content active" id="test2-3"><p><strong>This is Tab 3.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
+
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="demo3"><a href="#demo3" class="headerlink" title="demo3"></a>demo3</h3><div class="tabs" id="test3"><ul class="nav-tabs"><li class="tab"><button type="button" data-href="#test3-1">test3 1</button></li><li class="tab"><button type="button" data-href="#test3-2">test3 2</button></li><li class="tab"><button type="button" data-href="#test3-3">test3 3</button></li></ul><div class="tab-contents"><div class="tab-item-content" id="test3-1"><p><strong>This is Tab 1.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test3-2"><p><strong>This is Tab 2.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test3-3"><p><strong>This is Tab 3.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
+
+
+<h3 id="demo4"><a href="#demo4" class="headerlink" title="demo4"></a>demo4</h3><div class="tabs" id="test4"><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#test4-1">第一个Tab</button></li><li class="tab"><button type="button" data-href="#test4-2"><i class="fab fa-apple-pay" style="text-align: center;"></i></button></li><li class="tab"><button type="button" data-href="#test4-3"><i class="fas fa-bomb"></i>炸弹</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="test4-1"><p><strong>tab名字为第一个Tab</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test4-2"><p><strong>只有图标 没有Tab名字</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test4-3"><p><strong>名字+icon</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
+
+<h3 id="demo5"><a href="#demo5" class="headerlink" title="demo5"></a>demo5</h3><a class="btn-beautify button--animated [color] [style] [layout] [position] [size]" href="/%5Burl%5D" 
+  title="[text]"><i class="[icon]"></i><span>[text]</span></a>
+
+<p>[url]         : 链接<br>[text]        : 按钮文字<br>[icon]        : [可选] 图标<br>[color]       : [可选] 按钮背景顔色(默认style时）<br>                      按钮字体和边框顔色(outline时)<br>                      default/blue/pink/red/purple/orange/green<br>[style]       : [可选] 按钮样式 默认实心<br>                      outline/留空<br>[layout]      : [可选] 按钮佈局 默认为line<br>                      block/留空<br>[position]    : [可选] 按钮位置 前提是设置了layout为block 默认为左边<br>                      center/right/留空<br>[size]        : [可选] 按钮大小<br>                      larger/留空</p>
+<h3 id="demo6"><a href="#demo6" class="headerlink" title="demo6"></a>demo6</h3><img class="inline-img" src="/%5Bsrc%5D" style="height:[height]"/>
+
+<p>[src]      :    图片链接<br>[height]   ：   图片高度限制【可选】</p>
+<h3 id="demo7"><a href="#demo7" class="headerlink" title="demo7"></a>demo7</h3><p>臣亮言：<mark class="hl-label default">先帝</mark> 创业未半，而<mark class="hl-label blue">中道崩殂</mark> 。今天下三分，<mark class="hl-label pink">益州疲敝</mark> ，此诚<mark class="hl-label red">危急存亡之秋</mark> 也！然侍衞之臣，不懈于内；<mark class="hl-label purple">忠志之士</mark> ，忘身于外者，盖追先帝之殊遇，欲报之于陛下也。诚宜开张圣听，以光先帝遗德，恢弘志士之气；不宜妄自菲薄，引喻失义，以塞忠谏之路也。<br>宫中、府中，俱为一体；陟罚臧否，不宜异同。若有<mark class="hl-label orange">作奸</mark> 、<mark class="hl-label green">犯科</mark> ，及为忠善者，宜付有司，论其刑赏，以昭陛下平明之治；不宜偏私，使内外异法也。</p>
+]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
   </entry>
   <entry>
     <title>newpage</title>
@@ -132,64 +190,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2021/05/14/hello-world/</url>
-    <content><![CDATA[<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Tabs"><a href="#Tabs" class="headerlink" title="Tabs"></a>Tabs</h3><div class="tabs" id="unique-name"><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#unique-name-1"><i class="icon]"></i>[Tab caption] [</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="unique-name-1"><p>Any content (support inline tags too).</p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
-
-<p>Unique name   : Unique name of tabs block tag without comma.<br>                Will be used in #id’s as prefix for each tab with their index numbers.<br>                If there are whitespaces in name, for generate #id all whitespaces will replaced by dashes.<br>                Only for current url of post/page must be unique!<br>[index]       : Index number of active tab.<br>                If not specified, first tab (1) will be selected.<br>                If index is -1, no tab will be selected. It’s will be something like spoiler.<br>                Optional parameter.<br>[Tab caption] : Caption of current tab.<br>                If not caption specified, unique name with tab index suffix will be used as caption of tab.<br>                If not caption specified, but specified icon, caption will empty.<br>                Optional parameter.<br>[@icon]       : FontAwesome icon name (full-name, look like ‘fas fa-font’)<br>                Can be specified with or without space; e.g. ‘Tab caption @icon’ similar to ‘Tab caption@icon’.<br>                Optional parameter.</p>
-<h3 id="demo1"><a href="#demo1" class="headerlink" title="demo1"></a>demo1</h3><div class="tabs" id="test1"><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#test1-1">test1 1</button></li><li class="tab"><button type="button" data-href="#test1-2">test1 2</button></li><li class="tab"><button type="button" data-href="#test1-3">test1 3</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="test1-1"><p><strong>This is Tab 1.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test1-2"><p><strong>This is Tab 2.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test1-3"><p><strong>This is Tab 3.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
-
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="demo2"><a href="#demo2" class="headerlink" title="demo2"></a>demo2</h3><div class="tabs" id="test2"><ul class="nav-tabs"><li class="tab"><button type="button" data-href="#test2-1">test2 1</button></li><li class="tab"><button type="button" data-href="#test2-2">test2 2</button></li><li class="tab active"><button type="button" data-href="#test2-3">test2 3</button></li></ul><div class="tab-contents"><div class="tab-item-content" id="test2-1"><p><strong>This is Tab 1.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test2-2"><p><strong>This is Tab 2.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content active" id="test2-3"><p><strong>This is Tab 3.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
-
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="demo3"><a href="#demo3" class="headerlink" title="demo3"></a>demo3</h3><div class="tabs" id="test3"><ul class="nav-tabs"><li class="tab"><button type="button" data-href="#test3-1">test3 1</button></li><li class="tab"><button type="button" data-href="#test3-2">test3 2</button></li><li class="tab"><button type="button" data-href="#test3-3">test3 3</button></li></ul><div class="tab-contents"><div class="tab-item-content" id="test3-1"><p><strong>This is Tab 1.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test3-2"><p><strong>This is Tab 2.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test3-3"><p><strong>This is Tab 3.</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
-
-
-<h3 id="demo4"><a href="#demo4" class="headerlink" title="demo4"></a>demo4</h3><div class="tabs" id="test4"><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#test4-1">第一个Tab</button></li><li class="tab"><button type="button" data-href="#test4-2"><i class="fab fa-apple-pay" style="text-align: center;"></i></button></li><li class="tab"><button type="button" data-href="#test4-3"><i class="fas fa-bomb"></i>炸弹</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="test4-1"><p><strong>tab名字为第一个Tab</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test4-2"><p><strong>只有图标 没有Tab名字</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="test4-3"><p><strong>名字+icon</strong></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
-
-<h3 id="demo5"><a href="#demo5" class="headerlink" title="demo5"></a>demo5</h3><a class="btn-beautify button--animated [color] [style] [layout] [position] [size]" href="/%5Burl%5D" 
-  title="[text]"><i class="[icon]"></i><span>[text]</span></a>
-
-<p>[url]         : 链接<br>[text]        : 按钮文字<br>[icon]        : [可选] 图标<br>[color]       : [可选] 按钮背景顔色(默认style时）<br>                      按钮字体和边框顔色(outline时)<br>                      default/blue/pink/red/purple/orange/green<br>[style]       : [可选] 按钮样式 默认实心<br>                      outline/留空<br>[layout]      : [可选] 按钮佈局 默认为line<br>                      block/留空<br>[position]    : [可选] 按钮位置 前提是设置了layout为block 默认为左边<br>                      center/right/留空<br>[size]        : [可选] 按钮大小<br>                      larger/留空</p>
-<h3 id="demo6"><a href="#demo6" class="headerlink" title="demo6"></a>demo6</h3><img class="inline-img" src="/%5Bsrc%5D" style="height:[height]"/>
-
-<p>[src]      :    图片链接<br>[height]   ：   图片高度限制【可选】</p>
-<h3 id="demo7"><a href="#demo7" class="headerlink" title="demo7"></a>demo7</h3><p>臣亮言：<mark class="hl-label default">先帝</mark> 创业未半，而<mark class="hl-label blue">中道崩殂</mark> 。今天下三分，<mark class="hl-label pink">益州疲敝</mark> ，此诚<mark class="hl-label red">危急存亡之秋</mark> 也！然侍衞之臣，不懈于内；<mark class="hl-label purple">忠志之士</mark> ，忘身于外者，盖追先帝之殊遇，欲报之于陛下也。诚宜开张圣听，以光先帝遗德，恢弘志士之气；不宜妄自菲薄，引喻失义，以塞忠谏之路也。<br>宫中、府中，俱为一体；陟罚臧否，不宜异同。若有<mark class="hl-label orange">作奸</mark> 、<mark class="hl-label green">犯科</mark> ，及为忠善者，宜付有司，论其刑赏，以昭陛下平明之治；不宜偏私，使内外异法也。</p>
-]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>github配置webhook实现博客自动部署</title>
-    <url>/2021/09/25/github%E9%85%8D%E7%BD%AEwebhook%E5%AE%9E%E7%8E%B0%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2/</url>
-    <content><![CDATA[<p>因为经常更新博客，每次都需要手动push，再从github上pull到主机，重复操作很麻烦，因此配置webhook实现自动部署，<br>解放双手！</p>
-<p>###在主机中写入server.js文件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">var http = require(&#x27;http&#x27;)</span><br><span class="line">  , exec = require(&#x27;exec&#x27;)</span><br><span class="line"> </span><br><span class="line">const PORT = 9988</span><br><span class="line">  , PATH = &#x27;../html&#x27;</span><br><span class="line"> </span><br><span class="line">var deployServer = http.createServer(function(request, response) &#123;</span><br><span class="line">  if (request.url.search(/deploy\/?$/i) &gt; 0) &#123;</span><br><span class="line"> </span><br><span class="line">    var commands = [</span><br><span class="line">      &#x27;cd &#x27; + PATH,</span><br><span class="line">      &#x27;git fetch --all&#x27;,</span><br><span class="line">      &#x27;git reset --hard origin/master&#x27;,</span><br><span class="line">      &#x27;git pull origin master&#x27;</span><br><span class="line">    ].join(&#x27; &amp;&amp; &#x27;)</span><br><span class="line"> </span><br><span class="line">    exec(commands, function(err, out, code) &#123;</span><br><span class="line">      if (err instanceof Error) &#123;</span><br><span class="line">        response.writeHead(500)</span><br><span class="line">        response.end(&#x27;Server Internal Error.&#x27;)</span><br><span class="line">        throw err</span><br><span class="line">      &#125;</span><br><span class="line">      process.stderr.write(err)</span><br><span class="line">      process.stdout.write(out)</span><br><span class="line">      response.writeHead(200)</span><br><span class="line">      response.end(&#x27;Deploy Done.&#x27;)</span><br><span class="line"> </span><br><span class="line">    &#125;)</span><br><span class="line"> </span><br><span class="line">  &#125; else &#123;</span><br><span class="line"> </span><br><span class="line">    response.writeHead(404)</span><br><span class="line">    response.end(&#x27;Not Found.&#x27;)</span><br><span class="line"> </span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"> </span><br><span class="line">deployServer.listen(PORT)</span><br></pre></td></tr></table></figure>
-
-<p>###后台启动server.js<br>因为直接使用node server.js ，可能会被杀掉进程，不能保持运行，所以使用pm2来管理进程，<br>(或者使用forever)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install pm2 -g</span><br></pre></td></tr></table></figure>
-<p>另外使用server_run.js脚本来启动server.js</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//run</span><br><span class="line">const &#123; exec &#125; = require(&#x27;child_process&#x27;)</span><br><span class="line">exec(&#x27;node server.js&#x27;,(error, stdout, stderr) =&gt; &#123;</span><br><span class="line">        if(error)&#123;</span><br><span class="line">                console.log(&#x27;exec error: $&#123;error&#125;&#x27;)</span><br><span class="line">                return</span><br><span class="line">        &#125;</span><br><span class="line">        console.log(&#x27;stdout: $&#123;stdout&#125;&#x27;);</span><br><span class="line">        console.log(&#x27;stderr: $&#123;stderr&#125;&#x27;);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>将server_run.js添加到pm2进程</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo pm2 start server_run.js  // 启动服务</span><br><span class="line"> </span><br><span class="line">sudo pm2 save // 保存服务</span><br><span class="line"> </span><br><span class="line">sudo pm2 startup // 把已启动服务加到systemd中</span><br><span class="line"> </span><br><span class="line">sudo systemctl reboot // 重启，发现之前的服务都已经启动</span><br><span class="line"> </span><br><span class="line">sudo pm2 unstartup systemd // 删除自动启动服务</span><br></pre></td></tr></table></figure>
-<p>###使用forever保持进程<br>安装forever</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -g forever</span><br></pre></td></tr></table></figure>
-<p>运行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">forever start server.js</span><br></pre></td></tr></table></figure>
-
-
-<p>好了，server.js监听9988端口，<a href="https://github.com/[">https://github.com/[</a> 用户名 ]/[ 仓库名称 ]/settings/hooks中<br>添加<a href="http://198.168.xxx.xxx:9988/deploy/">http://198.168.xxx.xxx:9988/deploy/</a><br>当本地Push仓库后，github会自动发送请求从而实现自动部署</p>
-]]></content>
-      <tags>
-        <tag>github</tag>
-        <tag>webhook</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>nginx开启https配置</title>
     <url>/2021/09/24/nginx%E5%BC%80%E5%90%AFhttps%E9%85%8D%E7%BD%AE/</url>
     <content><![CDATA[<h2 id="nginx已经安装配置后"><a href="#nginx已经安装配置后" class="headerlink" title="nginx已经安装配置后"></a>nginx已经安装配置后</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim /usr/local/nginx/conf/nginx.conf #编辑nginx.conf配置文件</span><br></pre></td></tr></table></figure>
@@ -248,6 +248,13 @@
       <tags>
         <tag>win10</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>win10安装linux子系统</title>
+    <url>/2022/05/20/win10%E5%AE%89%E8%A3%85linux%E5%AD%90%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h1 id="win10开启在windows功能下开启-linux子系统和虚拟机平台两个功能"><a href="#win10开启在windows功能下开启-linux子系统和虚拟机平台两个功能" class="headerlink" title="win10开启在windows功能下开启 linux子系统和虚拟机平台两个功能"></a>win10开启在windows功能下开启 linux子系统和虚拟机平台两个功能</h1><h1 id="安装Ubuntu"><a href="#安装Ubuntu" class="headerlink" title="安装Ubuntu"></a>安装Ubuntu</h1><p>方式一：微软商店搜索Ubuntu（占用系统盘空间）<br>方式二：去微软官网下载Ubuntu系统压缩包解压到非系统盘<br><a href="https://docs.microsoft.com/zh-CN/windows/wsl/install-manual">https://docs.microsoft.com/zh-CN/windows/wsl/install-manual</a><br>curl.exe -L -o ubuntu-2004.appx <a href="https://aka.ms/wslubuntu2004">https://aka.ms/wslubuntu2004</a></p>
+<h1 id="安装LXRunOffline-管理linux子系统"><a href="#安装LXRunOffline-管理linux子系统" class="headerlink" title="安装LXRunOffline 管理linux子系统"></a>安装LXRunOffline 管理linux子系统</h1><h1 id="解决wsl-下centos无法运行docker"><a href="#解决wsl-下centos无法运行docker" class="headerlink" title="解决wsl 下centos无法运行docker"></a>解决wsl 下centos无法运行docker</h1><p>方式一： nohup dockerd &gt; dockerlog.log 2&gt;&amp;1 &amp;</p>
+]]></content>
   </entry>
   <entry>
     <title>图库</title>
