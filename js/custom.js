@@ -39,10 +39,10 @@ function loadlive2d() {
         document.onreadystatechange = function () {
             if (document.readyState == "complete") {
                 //https://cdn.jsdelivr.net/combine/npm/luxiaojie-oss@1.0.4/pixi.min.js,npm/luxiaojie-oss@1.0.4/live2dcubismcore.min.js,npm/luxiaojie-oss@1.0.4/live2dcubismframework.min.js,npm/luxiaojie-oss@1.0.4/live2dcubismpixi.min.js
-                loadScript('https://npm.elemecdn.com/luxiaojie-oss@latest/pixi.min.js', () => {
-                    loadScript('https://npm.elemecdn.com/luxiaojie-oss@latest/live2dcubismcore.min.js', () => {
-                        loadScript('https://npm.elemecdn.com/luxiaojie-oss@latest/live2dcubismframework.js', () => {
-                            loadScript('https://npm.elemecdn.com/luxiaojie-oss@latest/live2dcubismpixi.js', () => {
+                loadScript('https://npm.elemecdn.com/luxiaojie-oss@1.0.6/pixi.min.js', () => {
+                    loadScript('https://npm.elemecdn.com/luxiaojie-oss@1.0.6/live2dcubismcore.min.js', () => {
+                        loadScript('https://npm.elemecdn.com/luxiaojie-oss@1.0.6/live2dcubismframework.js', () => {
+                            loadScript('https://npm.elemecdn.com/luxiaojie-oss@1.0.6/live2dcubismpixi.js', () => {
                                 loadScript('/js/load.js', function () {
                                     loadModel();
                                 })
